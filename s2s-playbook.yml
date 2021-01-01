@@ -75,6 +75,7 @@
        - { src: ipsec.conf.j2, dest: /etc/ipsec.conf, mode: '0644' }
        - { src: ipsec.secrets.j2, dest: /etc/ipsec.secrets, mode: '0644' }
        - { src: aws-updown.sh.j2, dest: /etc/ipsec.d/aws-updown.sh, mode: '0744' }
+      notify: enable ipsec
 
     - name: fix esx disk uuid
       template:
@@ -96,4 +97,4 @@
         state: present
         reload: yes
       with_dict: '{{ sysctl_config }}'
-      notify: enable ipsec       
+             
