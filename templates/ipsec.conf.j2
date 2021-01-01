@@ -28,9 +28,9 @@ conn Tunnel{{ loop.index }}
 	dpdtimeout=30s
 	dpdaction=restart
 	## Please note the following line assumes you only have two tunnels in your Strongswan configuration file. This "mark" value must be unique and may need to be changed based on other entries in your configuration file.
-	mark=10{{ loop.index }}
+	mark={{ loop.index }}00
 	## Uncomment the following line to utilize the script from the "Automated Tunnel Healhcheck and Failover" section. Ensure that the integer after "-m" matches the "mark" value above, and <VPC CIDR> is replaced with the CIDR of your VPC
 	## (e.g. 192.168.1.0/24)
-	leftupdown="/etc/ipsec.d/aws-updown.sh -ln Tunnel{{ loop.index }} -ll {{ tun.customer_gateway.tunnel_inside_address.ip_address }}/{{ tun.customer_gateway.tunnel_inside_address.network_cidr }} -lr {{ tun.vpn_gateway.tunnel_inside_address.ip_address }}/{{ tun.vpn_gateway.tunnel_inside_address.network_cidr }} -m 10{{ loop.index }} -r {{ aws_cidr }}"
+	leftupdown="/etc/ipsec.d/aws-updown.sh -ln Tunnel{{ loop.index }} -ll {{ tun.customer_gateway.tunnel_inside_address.ip_address }}/{{ tun.customer_gateway.tunnel_inside_address.network_cidr }} -lr {{ tun.vpn_gateway.tunnel_inside_address.ip_address }}/{{ tun.vpn_gateway.tunnel_inside_address.network_cidr }} -m {{ loop.index }}00 -r {{ aws_cidr }}"
 
 {% endfor %}
