@@ -1,0 +1,36 @@
+# ipsec.conf - strongSwan IPsec configuration file
+
+# basic configuration
+
+config setup
+	# strictcrlpolicy=yes
+	uniqueids = no
+
+# Add connections here.
+{% for tun in vpn_config.vpn_connection.ipsec_tunnel %}
+conn Tunnel{{ loop.index }}
+	auto=start
+	left=%defaultroute
+	leftid={{ tun.customer_gateway.tunnel_outside_address.ip_address }}
+	right={{ tun.vpn_gateway.tunnel_outside_address.ip_address }}
+	type=tunnel
+	leftauth=psk
+	rightauth=psk
+	keyexchange=ikev1
+	ike=aes128-sha1-modp1024
+	ikelifetime=8h
+	esp=aes128-sha1-modp1024
+	lifetime=1h
+	keyingtries=%forever
+	leftsubnet=0.0.0.0/0
+	rightsubnet=0.0.0.0/0
+	dpddelay=10s
+	dpdtimeout=30s
+	dpdaction=restart
+	## Please note the following line assumes you only have two tunnels in your Strongswan configuration file. This "mark" value must be unique and may need to be changed based on other entries in your configuration file.
+	mark=10{{ loop.index }}
+	## Uncomment the following line to utilize the script from the "Automated Tunnel Healhcheck and Failover" section. Ensure that the integer after "-m" matches the "mark" value above, and <VPC CIDR> is replaced with the CIDR of your VPC
+	## (e.g. 192.168.1.0/24)
+	leftupdown="/etc/ipsec.d/aws-updown.sh -ln Tunnel{{ loop.index }} -ll {{ tun.customer_gateway.tunnel_inside_address.ip_address }}/{{ tun.customer_gateway.tunnel_inside_address.network_cidr }} -lr {{ tun.vpn_gateway.tunnel_inside_address.ip_address }}/{{ tun.vpn_gateway.tunnel_inside_address.network_cidr }} -m 10{{ loop.index }} -r {{ aws_cidr }}"
+
+{% endfor %}

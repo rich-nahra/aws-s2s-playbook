@@ -1,0 +1,13 @@
+all:
+  children:
+    vpn:
+      hosts:
+        #strongswan server
+        s2su: 
+          ansible_host: 192.168.xxx.xxx
+          ansible_user: xxxxx
+    control:
+      hosts:
+        # local machine (ansible control machine)
+        devbox:
+          ansible_connection: local
