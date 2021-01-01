@@ -1,38 +1,30 @@
-- name: site to site vpn 
+- name: site to site vpn play
   hosts: control
   gather_facts: no
   become: no
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
   environment:
-    #AWS_PROFILE: orgs
-    AWS_DEFAULT_REGION: us-east-2
+    AWS_DEFAULT_REGION: "{{ region }}"
   pre_tasks:
-    - name: Install boto3 and botocore with pip3 module
+    - name: install boto3 and botocore with pip3 module
       pip:
         name: 
         - boto3
         - botocore
         - lxml
   tasks:
-    - name: get vpn client configuration
+    - name: read vpn client configuration
       ec2_vpc_vpn_info:
-        region: us-east-2
       register: vpn_info
     
     - name: parse xml and set fact 
       set_fact: 
         vpn_config: "{{ vpn_info.vpn_connections[0].customer_gateway_configuration | xml_to_json }}"
 
-- name: site to site vpn 
+- name: site to site vpn play
   hosts: vpn
   become: yes
   vars:
-    ansible_python_interpreter: /usr/bin/python3
     vpn_config: "{{ hostvars[groups['control'][0]]['vpn_config'] }}"
-    aws_cidr: '10.0.0.0/16'
-    sysctl_config:
-      net.ipv4.ip_forward: 1
   handlers:
     - name: restart multipathd
       ansible.builtin.service:
@@ -89,7 +81,7 @@
        - { src: multipath.conf.j2, dest: /etc/multipath.conf, mode: '0644'}
       notify: restart multipathd
     
-    - name: Change various sysctl-settings
+    - name: update sysctl
       sysctl:
         name: '{{ item.key }}'
         value: '{{ item.value }}'

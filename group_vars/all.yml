@@ -1,0 +1,7 @@
+region: us-east-2
+aws_cidr: '10.0.0.0/16'
+
+ansible_python_interpreter: /usr/bin/python3
+
+sysctl_config:
+  net.ipv4.ip_forward: 1
